@@ -1,0 +1,1 @@
+insert into countries (country_name, region_id, population) values ('DBstan', 1, 1000);
