@@ -76,7 +76,7 @@ SELECT * FROM countries WHERE name = 'string';
 CREATE INDEX idx_employees_name_surname ON employees (first_name, last_name);
 SELECT * FROM employees WHERE first_name = 'John' AND last_name = 'Doe';
 
-CREATE INDEX idx_employees_salary ON employees (salary);
+CREATE UNIQUE INDEX idx_employees_salary ON employees (salary);
 SELECT * FROM employees WHERE salary < 100000 AND salary > 70000;
 
 CREATE INDEX idx_employees_name_substr ON employees (substring(first_name from 1 for 4));
