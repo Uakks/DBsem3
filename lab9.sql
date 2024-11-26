@@ -31,19 +31,24 @@ END;
 $$
     LANGUAGE plpgsql;
 
+call increase_value(20);
+
 --2
-CREATE OR REPLACE FUNCTION compare_numbers(a INTEGER, b INTEGER, OUT result TEXT)
+CREATE OR REPLACE FUNCTION compare_numbers(a INTEGER, b INTEGER)
+    returns TEXT
 AS $$
 BEGIN
     IF a > b THEN
-        result := 'Greater';
+        return 'Greater';
     ELSIF a < b THEN
-        result := 'Lesser';
+        return 'Lesser';
     ELSE
-        result := 'Equal';
+        return 'Equal';
     END IF;
 END; $$
 LANGUAGE plpgsql;
+
+select compare_numbers(5, 10);
 
 --3
 CREATE OR REPLACE FUNCTION number_series(n INTEGER)
@@ -54,6 +59,8 @@ BEGIN
     END LOOP;
 END; $$
 LANGUAGE plpgsql;
+
+select number_series(10);
 
 --4
 CREATE OR REPLACE FUNCTION find_employee(emp_name VARCHAR)
@@ -99,37 +106,39 @@ BEGIN
 END; $$
 LANGUAGE plpgsql;
 
-SELECT calculate_bonus('Asdf');
+SELECT * FROM employees;
 SELECT update_salary('Asdf');
 SELECT * FROM employees;
 
 --7
-DROP PROCEDURE IF EXISTS complex_calculation;
-
-CREATE OR REPLACE PROCEDURE complex_calculation(input_number INTEGER, input_text VARCHAR)
+CREATE OR REPLACE FUNCTION complex_calculation(input_number INTEGER, input_string VARCHAR)
+RETURNS VARCHAR
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    reversed_text VARCHAR;
-    factorial_result BIGINT := 1;
-    i INTEGER;
+    numeric_result BIGINT := 1;
+    string_result VARCHAR;
+    final_result VARCHAR;
 BEGIN
-    <<string_manipulation>>
+    <<main_block>>
     BEGIN
-        reversed_text := reverse(input_text);
-        RAISE NOTICE 'Reversed text: %', reversed_text;
-    END string_manipulation;
+        <<numeric_block>>
+        BEGIN
+            for i in 1..input_number loop
+                numeric_result := numeric_result * i;
+            end loop;
+        END numeric_block;
 
-    <<numeric_computation>>
-    BEGIN
-        FOR i IN 1..input_number LOOP
-            factorial_result := factorial_result * i;
-        END LOOP;
-        RAISE NOTICE 'Factorial of %: %', input_number, factorial_result;
-    END numeric_computation;
+        <<string_block>>
+        BEGIN
+            string_result := reverse(input_string);
+        END string_block;
 
-    RAISE NOTICE 'Final Result: Reversed Text: %, Factorial: %', reversed_text, factorial_result;
-END;
+        final_result := 'Numeric Result: ' || numeric_result || ', String Result: ' || string_result;
+    END main_block;
+
+    RETURN final_result;
+END
 $$;
 
-CALL complex_calculation(5, 'Hello');
+SELECT complex_calculation(5, 'example');
